@@ -1,0 +1,3515 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta title="dnezRaider Discord Selfbot">
+    <meta name="description" content="The best Discord Selfbot available. No downloads. No installations. Just login and raid.">
+    <meta name="google-site-verification" content="fRy6kKtjPth_pD4unH8SazJcHLoEVsNirthqHatQlLs" />
+    <title>dnezraider v4</title>
+    <link rel="stylesheet" href="../../theme.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --border: rgba(83, 67, 65, 0.6);
+        }
+
+        body {
+            min-height: 100dvh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-subtle), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(255, 180, 171, 0.03), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============ OOBE - Windows 11 Style ============ */
+        #oobe {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        #oobe::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 30% 20%, var(--accent-subtle), transparent 40%),
+                radial-gradient(circle at 70% 80%, rgba(255, 180, 171, 0.08), transparent 40%);
+            animation: oobeGradient 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes oobeGradient {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(2%, 2%) rotate(5deg); }
+            50% { transform: translate(-1%, 3%) rotate(-3deg); }
+            75% { transform: translate(1%, -2%) rotate(2deg); }
+        }
+
+        .oobe-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 560px;
+            animation: oobeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes oobeSlideUp {
+            from { opacity: 0; transform: translateY(60px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .oobe-logo {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .oobe-logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow-glow);
+            animation: oobePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes oobePulse {
+            0%, 100% { box-shadow: var(--shadow-glow); transform: scale(1); }
+            50% { box-shadow: 0 0 60px var(--accent-glow); transform: scale(1.02); }
+        }
+
+        .oobe-logo-icon i {
+            width: 40px;
+            height: 40px;
+            color: var(--bg-primary);
+        }
+
+        .oobe-logo h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .oobe-progress {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .oobe-progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            transition: all var(--transition-normal);
+        }
+
+        .oobe-progress-dot.active {
+            width: 32px;
+            border-radius: 4px;
+            background: var(--accent);
+        }
+
+        .oobe-progress-dot.completed {
+            background: var(--accent);
+        }
+
+        .oobe-step {
+            display: none;
+            animation: oobeStepIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .oobe-step.active {
+            display: block;
+        }
+
+        @keyframes oobeStepIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .oobe-step-title {
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .oobe-step-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .oobe-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            backdrop-filter: blur(20px);
+        }
+
+        .oobe-theme-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .oobe-theme-option {
+            position: relative;
+            padding: 20px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-align: center;
+        }
+
+        .oobe-theme-option:hover {
+            background: var(--bg-elevated);
+            transform: translateY(-2px);
+        }
+
+        .oobe-theme-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-subtle);
+        }
+
+        .oobe-theme-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .oobe-theme-preview {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .oobe-theme-option[data-theme="dark"] .oobe-theme-preview {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .oobe-theme-option[data-theme="light"] .oobe-theme-preview {
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .oobe-theme-option[data-theme="system"] .oobe-theme-preview {
+            background: linear-gradient(135deg, #1a1a1a 50%, #ffffff 50%);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .oobe-theme-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .oobe-form-group {
+            margin-bottom: 20px;
+        }
+
+        .oobe-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .oobe-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+
+        .oobe-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-subtle);
+        }
+
+        .oobe-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .oobe-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .oobe-btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            font-family: inherit;
+        }
+
+        .oobe-btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: var(--bg-primary);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .oobe-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--accent-glow);
+        }
+
+        .oobe-btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .oobe-btn-secondary:hover {
+            background: var(--bg-elevated);
+        }
+
+        /* ============ Main App Container ============ */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            min-height: 100dvh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-container.visible {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+        }
+
+        /* ============ Sidebar ============ */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform var(--transition-normal);
+            padding-top: var(--safe-area-top);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 300px;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .sidebar-brand-icon i {
+            width: 22px;
+            height: 22px;
+            color: var(--bg-primary);
+        }
+
+        .sidebar-brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-brand-text span {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .sidebar-account {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .account-selector {
+            position: relative;
+        }
+
+        .account-selected {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: 1px solid var(--border);
+        }
+
+        .account-selected:hover {
+            background: var(--bg-elevated);
+            border-color: var(--border-light);
+        }
+
+        .account-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--bg-primary);
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        .account-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .account-name {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .account-status {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .account-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .account-chevron {
+            color: var(--text-tertiary);
+            transition: transform var(--transition-fast);
+        }
+
+        .account-selector.open .account-chevron {
+            transform: rotate(180deg);
+        }
+
+        .account-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-fast);
+            z-index: 50;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .account-selector.open .account-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .account-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .account-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .account-dropdown-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .account-dropdown-item.active {
+            background: var(--accent-subtle);
+        }
+
+        .account-dropdown-actions {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .account-action {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .account-action i {
+            width: 16px;
+            height: 16px;
+        }
+
+        .account-action:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .account-action.delete:hover {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--error);
+        }
+
+        .add-account-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--accent-subtle);
+            border: 1px dashed var(--accent);
+            border-radius: var(--radius-md);
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .add-account-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-style: solid;
+        }
+
+        .add-account-btn i {
+            width: 16px;
+            height: 16px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            margin-bottom: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--accent);
+            border-radius: 0 2px 2px 0;
+            transition: height var(--transition-fast);
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-subtle);
+            color: var(--accent);
+        }
+
+        .nav-item.active::before {
+            height: 24px;
+        }
+
+        .nav-item i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            padding-bottom: calc(16px + var(--safe-area-bottom));
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-elevated);
+        }
+
+        .theme-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle-label i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .theme-toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            position: relative;
+            transition: background var(--transition-fast);
+        }
+
+        .theme-toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all var(--transition-fast);
+        }
+
+        .theme-toggle.active .theme-toggle-switch {
+            background: var(--accent);
+        }
+
+        .theme-toggle.active .theme-toggle-switch::after {
+            left: 23px;
+            background: var(--bg-primary);
+        }
+
+        /* ============ Main Content ============ */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 16px 24px;
+            padding-top: calc(16px + var(--safe-area-top));
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-btn i {
+            width: 20px;
+            height: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .header-btn i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .header-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .main-body {
+            flex: 1;
+            padding: 24px;
+            padding-bottom: calc(24px + var(--safe-area-bottom));
+        }
+
+        @media (max-width: 768px) {
+            .main-body {
+                padding: 16px;
+            }
+        }
+
+        /* ============ Sections ============ */
+        .section {
+            display: none;
+            animation: sectionIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes sectionIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ Cards ============ */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all var(--transition-fast);
+        }
+
+        .card:hover {
+            border-color: var(--border-light);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            width: 20px;
+            height: 20px;
+            color: var(--accent);
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        /* ============ Stats Grid ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: var(--accent-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon i {
+            width: 24px;
+            height: 24px;
+            color: var(--accent);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* ============ Form Elements ============ */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-subtle);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        textarea.form-input {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a0a0a0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 44px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            transition: background var(--transition-fast);
+        }
+
+        .form-checkbox:hover {
+            background: var(--bg-elevated);
+        }
+
+        .form-checkbox input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .form-checkbox span {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ============ Buttons ============ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: var(--bg-primary);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-elevated);
+            border-color: var(--border-light);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ef4444;
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* ============ Console ============ */
+        .console-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .console-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .console-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .console-title i {
+            width: 16px;
+            height: 16px;
+        }
+
+        .console-body {
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .console-line {
+            display: flex;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
+        .console-timestamp {
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+        }
+
+        .console-message {
+            color: var(--text-secondary);
+            word-break: break-word;
+        }
+
+        .console-message.success {
+            color: var(--success);
+        }
+
+        .console-message.fail {
+            color: var(--error);
+        }
+
+        .console-message.ping {
+            color: var(--info);
+        }
+
+        /* ============ Info Box ============ */
+        .info-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .info-box-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-box-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-box-label {
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+
+        .info-box-value {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .info-box-value.success {
+            color: var(--success);
+        }
+
+        .info-box-value.error {
+            color: var(--error);
+        }
+
+        /* ============ Modal ============ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: modalOverlayIn 0.2s ease;
+        }
+
+        @keyframes modalOverlayIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 0;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 0 24px 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* ============ Toast/Alert ============ */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .toast-container {
+                left: 12px;
+                right: 12px;
+                top: 12px;
+            }
+        }
+
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 420px;
+            box-shadow: var(--shadow-lg);
+            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (max-width: 768px) {
+            .toast {
+                min-width: 0;
+                max-width: 100%;
+            }
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .toast.closing {
+            animation: toastOut 0.2s ease forwards;
+        }
+
+        @keyframes toastOut {
+            to { opacity: 0; transform: translateX(40px); }
+        }
+
+        .toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast-icon i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .toast.success .toast-icon {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+        }
+
+        .toast.error .toast-icon {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--error);
+        }
+
+        .toast.warning .toast-icon {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--warning);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .toast-close {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .toast-close i {
+            width: 16px;
+            height: 16px;
+        }
+
+        .toast-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        /* ============ Mobile Overlay ============ */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-overlay.active {
+                display: block;
+            }
+        }
+
+        /* ============ Scrollbar ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-elevated);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        /* ============ Utility Classes ============ */
+        .text-success { color: var(--success); }
+        .text-error { color: var(--error); }
+        .text-warning { color: var(--warning); }
+        .text-accent { color: var(--accent); }
+        .text-muted { color: var(--text-tertiary); }
+        .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+        .hidden { display: none !important; }
+
+        /* ============ Token Guide ============ */
+        .token-guide {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .token-guide-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .token-guide-header:hover {
+            background: var(--bg-elevated);
+        }
+
+        .token-guide-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .token-guide-title i {
+            width: 18px;
+            height: 18px;
+            color: var(--accent);
+        }
+
+        .token-guide-header > i {
+            width: 18px;
+            height: 18px;
+            color: var(--text-tertiary);
+            transition: transform var(--transition-fast);
+        }
+
+        .token-guide.open .token-guide-header > i {
+            transform: rotate(180deg);
+        }
+
+        .token-guide-content {
+            display: none;
+            padding: 0 16px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .token-guide.open .token-guide-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .token-guide-steps {
+            padding-top: 16px;
+        }
+
+        .token-step {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .token-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .token-step-num {
+            width: 26px;
+            height: 26px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .token-step-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding-top: 3px;
+        }
+
+        .token-step-text strong {
+            color: var(--text-primary);
+        }
+
+        .token-step-text kbd {
+            display: inline-block;
+            padding: 2px 6px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .token-step-text code {
+            padding: 2px 6px;
+            background: var(--bg-elevated);
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 12px;
+            color: var(--accent-light);
+        }
+
+        .token-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 16px;
+            padding: 12px 14px;
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            border-radius: var(--radius-sm);
+        }
+
+        .token-warning i {
+            width: 18px;
+            height: 18px;
+            color: var(--error);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .token-warning span {
+            font-size: 12px;
+            color: var(--error);
+            line-height: 1.5;
+        }
+
+        .token-warning strong {
+            color: var(--error);
+        }
+
+        /* ============ Webhook Preview ============ */
+        .webhook-preview {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            margin-top: 20px;
+        }
+
+        .webhook-preview-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .webhook-preview-content {
+            flex: 1;
+        }
+
+        .webhook-preview-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--accent);
+        }
+
+        .webhook-preview-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+    </style>
+    <script>fetch('/logger?page=selfbot').catch(err => console.error(err));</script>
+<style>
+    html,
+    body {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        display: none;
+    }
+</style>
+</head>
+<body>
+    <script>
+        (function() {
+            let savedTheme = localStorage.getItem('dneraider_theme') || 'dark';
+            document.body.classList.add(savedTheme === 'light' ? 'light' : 'dark');
+        })();
+    </script>
+
+    <!-- Security Warning -->
+    <div id="token-warning" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff4444;color:#fff;text-align:center;padding:10px 20px;font-size:14px;font-weight:bold;">
+        ⚠️ Your Discord token is stored in your browser's localStorage. Never share it. Anyone with your token has full access to your Discord account. Use at your own risk.
+        <span onclick="this.parentElement.style.display='none'" style="cursor:pointer;margin-left:15px;padding:2px 8px;border:1px solid #fff;border-radius:4px;">✕</span>
+    </div>
+    <script>
+        if (localStorage.getItem('discord_token')) {
+            document.getElementById('token-warning').style.display = 'block';
+        }
+    </script>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- OOBE -->
+    <div id="oobe" style="display: none;">
+        <div class="oobe-container">
+            <div class="oobe-logo">
+                <div class="oobe-logo-icon">
+                    <i data-lucide="zap"></i>
+                </div>
+                <h1>dnezraider v4</h1>
+            </div>
+
+            <div class="oobe-progress">
+                <div class="oobe-progress-dot active" id="progress-0"></div>
+                <div class="oobe-progress-dot" id="progress-1"></div>
+            </div>
+
+            <!-- Step 1: Theme Selection -->
+            <div class="oobe-step active" id="oobe-step-1">
+                <h2 class="oobe-step-title">Choose your theme</h2>
+                <p class="oobe-step-desc">Select the appearance that suits you best</p>
+                
+                <div class="oobe-card">
+                    <div class="oobe-theme-options">
+                        <div class="oobe-theme-option selected" data-theme="dark" onclick="selectTheme('dark')">
+                            <input type="radio" name="theme" value="dark" checked>
+                            <div class="oobe-theme-preview">
+                                <i data-lucide="moon" style="width: 24px; height: 24px; color: var(--accent);"></i>
+                            </div>
+                            <div class="oobe-theme-label">Dark</div>
+                        </div>
+                        <div class="oobe-theme-option" data-theme="light" onclick="selectTheme('light')">
+                            <input type="radio" name="theme" value="light">
+                            <div class="oobe-theme-preview">
+                                <i data-lucide="sun" style="width: 24px; height: 24px; color: var(--accent);"></i>
+                            </div>
+                            <div class="oobe-theme-label">Light</div>
+                        </div>
+                        <div class="oobe-theme-option" data-theme="system" onclick="selectTheme('system')">
+                            <input type="radio" name="theme" value="system">
+                            <div class="oobe-theme-preview">
+                                <i data-lucide="monitor" style="width: 24px; height: 24px; color: var(--accent);"></i>
+                            </div>
+                            <div class="oobe-theme-label">System</div>
+                        </div>
+                    </div>
+
+                    <div class="oobe-actions">
+                        <button class="oobe-btn oobe-btn-primary" onclick="oobeNext(1)">
+                            Continue
+                            <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Account Setup -->
+            <div class="oobe-step" id="oobe-step-2">
+                <h2 class="oobe-step-title">Add your first account</h2>
+                <p class="oobe-step-desc">Connect your Discord account to get started</p>
+                
+                <div class="oobe-card">
+                    <div class="oobe-form-group">
+                        <label class="oobe-label">Account Name</label>
+                        <input type="text" class="oobe-input" id="oobe-account-name" placeholder="Main Account">
+                    </div>
+                    <div class="oobe-form-group">
+                        <label class="oobe-label">Authorization Token</label>
+                        <input type="password" class="oobe-input" id="oobe-auth-token" placeholder="Enter your Discord token">
+                    </div>
+                    
+                    <!-- Token Guide -->
+                    <div class="token-guide">
+                        <div class="token-guide-header" onclick="toggleTokenGuide()">
+                            <div class="token-guide-title">
+                                <i data-lucide="help-circle"></i>
+                                <span>How to get your Discord token</span>
+                            </div>
+                            <i data-lucide="chevron-down" id="token-guide-chevron"></i>
+                        </div>
+                        <div class="token-guide-content" id="token-guide-content">
+                            <div class="token-guide-steps">
+                                <div class="token-step">
+                                    <div class="token-step-num">1</div>
+                                    <div class="token-step-text">
+                                        <strong>Open Discord</strong> in your browser (discord.com/app) or desktop app
+                                    </div>
+                                </div>
+                                <div class="token-step">
+                                    <div class="token-step-num">2</div>
+                                    <div class="token-step-text">
+                                        <strong>Open DevTools</strong> by pressing <kbd>F12</kbd> or <kbd>Ctrl+Shift+I</kbd> (Windows) / <kbd>Cmd+Option+I</kbd> (Mac)
+                                    </div>
+                                </div>
+                                <div class="token-step">
+                                    <div class="token-step-num">3</div>
+                                    <div class="token-step-text">
+                                        Go to the <strong>Network</strong> tab and check <strong>Preserve log</strong>
+                                    </div>
+                                </div>
+                                <div class="token-step">
+                                    <div class="token-step-num">4</div>
+                                    <div class="token-step-text">
+                                        Type <code>@me</code> in the filter box, then refresh the page (<kbd>F5</kbd>)
+                                    </div>
+                                </div>
+                                <div class="token-step">
+                                    <div class="token-step-num">5</div>
+                                    <div class="token-step-text">
+                                        Click on any request that appears (e.g., <code>@me</code> or <code>library</code>)
+                                    </div>
+                                </div>
+                                <div class="token-step">
+                                    <div class="token-step-num">6</div>
+                                    <div class="token-step-text">
+                                        Go to <strong>Headers</strong> tab, scroll down to <strong>Request Headers</strong>
+                                    </div>
+                                </div>
+                                <div class="token-step">
+                                    <div class="token-step-num">7</div>
+                                    <div class="token-step-text">
+                                        Find <code>authorization:</code> and copy the token value (starts with letters/numbers)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="token-warning">
+                                <i data-lucide="alert-triangle"></i>
+                                <span><strong>Warning:</strong> Never share your token with anyone! It gives full access to your account.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="oobe-actions">
+                        <button class="oobe-btn oobe-btn-secondary" onclick="oobeBack(2)">
+                            <i data-lucide="arrow-left"></i>
+                            Back
+                        </button>
+                        <button class="oobe-btn oobe-btn-primary" onclick="oobeFinish()">
+                            Get Started
+                            <i data-lucide="check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <div class="sidebar-brand-text">
+                        <h2>dnezraider</h2>
+                        <span>v4.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-account">
+                <div class="account-selector" id="account-selector">
+                    <div class="account-selected">
+                        <div class="account-avatar" id="account-avatar">?</div>
+                        <div class="account-info">
+                            <div class="account-name" id="account-name">Select Account</div>
+                            <div class="account-status">Active</div>
+                        </div>
+                        <i data-lucide="chevron-down" class="account-chevron"></i>
+                    </div>
+                    <div class="account-dropdown" id="account-dropdown">
+                        <!-- Accounts populated dynamically -->
+                    </div>
+                </div>
+                <button class="add-account-btn" onclick="openAddAccountModal()">
+                    <i data-lucide="plus"></i>
+                    Add Account
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a class="nav-item active" onclick="showSection('home')" id="nav-home">
+                        <i data-lucide="home"></i>
+                        Dashboard
+                    </a>
+                    <a class="nav-item" onclick="showSection('server')" id="nav-server">
+                        <i data-lucide="server"></i>
+                        Server Actions
+                    </a>
+                    <a class="nav-item" onclick="showSection('webhook')" id="nav-webhook">
+                        <i data-lucide="webhook"></i>
+                        Webhook Sender
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a class="nav-item" onclick="showSection('channel-manager')" id="nav-channel">
+                        <i data-lucide="folder"></i>
+                        Channel Manager
+                    </a>
+                    <a class="nav-item" onclick="showSection('threads-posts')" id="nav-threads">
+                        <i data-lucide="message-circle"></i>
+                        Thread Spammer
+                    </a>
+                    <a class="nav-item" onclick="showSection('console')" id="nav-console">
+                        <i data-lucide="terminal"></i>
+                        Console
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Config</div>
+                    <a class="nav-item" onclick="showSection('settings')" id="nav-settings">
+                        <i data-lucide="settings"></i>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="theme-toggle" id="theme-toggle">
+                    <div class="theme-toggle-label">
+                        <i data-lucide="moon"></i>
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="theme-toggle-switch"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobile-menu-btn">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h1 class="page-title" id="page-title">Dashboard</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" title="Refresh">
+                        <i data-lucide="refresh-cw"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="main-body">
+                <!-- Home Section -->
+                <section class="section active" id="home">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i data-lucide="users"></i>
+                            </div>
+                            <div class="stat-value" id="total-friends">0</div>
+                            <div class="stat-label">Friends</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i data-lucide="mail"></i>
+                            </div>
+                            <div class="stat-value" id="total-dms">0</div>
+                            <div class="stat-label">DM Channels</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i data-lucide="server"></i>
+                            </div>
+                            <div class="stat-value" id="total-servers">0</div>
+                            <div class="stat-label">Servers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i data-lucide="send"></i>
+                            </div>
+                            <div class="stat-value" id="total-messages-sent">0</div>
+                            <div class="stat-label">Messages Sent</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i data-lucide="activity"></i>
+                            </div>
+                            <div class="stat-value" id="websiteOnlineCount">0</div>
+                            <div class="stat-label">Visitors</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i data-lucide="activity"></i>
+                                    Session Stats
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i data-lucide="check-circle"></i>
+                                </div>
+                                <div class="stat-value text-success" id="total-successes-home">0</div>
+                                <div class="stat-label">Successful</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i data-lucide="x-circle"></i>
+                                </div>
+                                <div class="stat-value text-error" id="total-failures-home">0</div>
+                                <div class="stat-label">Failed</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Server Actions Section -->
+                <section class="section" id="server">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i data-lucide="server"></i>
+                                    Server Actions
+                                </div>
+                                <div class="card-subtitle">Send messages to server channels</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Server ID</label>
+                                <input type="text" class="form-input" id="server-id" placeholder="123456789012345678">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Channel ID (Optional)</label>
+                                <input type="text" class="form-input" id="channel-id" placeholder="Leave empty for random">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-input" id="server-message" placeholder="Enter your message here..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Number of Messages</label>
+                                <input type="number" class="form-input" id="server-num-messages" value="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delay (seconds)</label>
+                                <input type="number" class="form-input" id="message-delay" value="1" min="0.1" step="0.1">
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="startSendingServer()">
+                                <i data-lucide="send"></i>
+                                Send Messages
+                            </button>
+                            <button class="btn btn-danger" onclick="purgeMessages()">
+                                <i data-lucide="trash-2"></i>
+                                Purge Messages
+                            </button>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-box-row">
+                                <span class="info-box-label">Messages Sent</span>
+                                <span class="info-box-value" id="server-messages-sent">0</span>
+                            </div>
+                            <div class="info-box-row">
+                                <span class="info-box-label">Successful</span>
+                                <span class="info-box-value success" id="total-successes">0</span>
+                            </div>
+                            <div class="info-box-row">
+                                <span class="info-box-label">Failed</span>
+                                <span class="info-box-value error" id="total-failures">0</span>
+                            </div>
+                            <div class="info-box-row">
+                                <span class="info-box-label">Ping</span>
+                                <span class="info-box-value" id="ping">0ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Webhook Section -->
+                <section class="section" id="webhook">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i data-lucide="webhook"></i>
+                                    Webhook Sender
+                                </div>
+                                <div class="card-subtitle">Send messages via Discord webhook</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Webhook URL</label>
+                            <input type="text" class="form-input" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Webhook Name (Optional)</label>
+                            <input type="text" class="form-input" id="webhook-name" placeholder="Bot Name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-input" id="webhook-message" placeholder="Enter your message here..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Number of Messages</label>
+                                <input type="number" class="form-input" id="webhook-num-messages" value="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delay (seconds)</label>
+                                <input type="number" class="form-input" id="webhook-message-delay" value="1" min="0.1" step="0.1">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="startSendingWebhook()">
+                            <i data-lucide="send"></i>
+                            Send Messages
+                        </button>
+                        <div class="webhook-preview" id="webhook-preview" style="display: none;">
+                            <img class="webhook-preview-avatar" id="webhook-profile-preview" />
+                            <div class="webhook-preview-content">
+                                <div class="webhook-preview-name" id="webhook-name-preview">Webhook Bot</div>
+                                <div class="webhook-preview-message">Message preview will appear here...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Channel Manager Section -->
+                <section class="section" id="channel-manager">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i data-lucide="folder"></i>
+                                    Channel Manager
+                                </div>
+                                <div class="card-subtitle">Manage server channels in bulk</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Server ID</label>
+                            <input type="text" class="form-input" id="server-id-channel-manager" placeholder="123456789012345678">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Actions (one per line)</label>
+                            <textarea class="form-input" id="channel-actions" placeholder="create:channel-name
+delete:channel-id
+rename:channel-id:new-name
+delete_all
+rename_all:new-name"></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="processChannelActions()">
+                            <i data-lucide="play"></i>
+                            Execute Actions
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Thread Spammer Section -->
+                <section class="section" id="threads-posts">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i data-lucide="message-circle"></i>
+                                    Thread & Post Spammer
+                                </div>
+                                <div class="card-subtitle">Create multiple threads or forum posts</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Server</label>
+                                <select class="form-input" id="spammer-server-select" onchange="loadSpammerChannels()">
+                                    <option value="">Select a server</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Channel</label>
+                                <select class="form-input" id="spammer-channel-select" multiple>
+                                    <option value="">Select a server first</option>
+                                </select>
+                            </div>
+                        </div>
+                        <label class="form-checkbox">
+                            <input type="checkbox" id="spammer-all-channels" onchange="toggleAllChannelsSpammer()">
+                            <span>Use all channels</span>
+                        </label>
+                        <div class="form-group">
+                            <label class="form-label">Thread/Post Name</label>
+                            <input type="text" class="form-input" id="spammer-thread-name" placeholder="Thread title">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-input" id="spammer-thread-message" placeholder="Enter your message here..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Number per Channel</label>
+                                <input type="number" class="form-input" id="spammer-num" value="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delay (seconds)</label>
+                                <input type="number" class="form-input" id="spammer-delay" value="1" min="0.1" step="0.1">
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="startThreadsSpammer()">
+                                <i data-lucide="message-square"></i>
+                                Spam Threads
+                            </button>
+                            <button class="btn btn-primary" onclick="startPostsSpammer()">
+                                <i data-lucide="file-text"></i>
+                                Spam Posts
+                            </button>
+                        </div>
+                        <div class="info-box" id="spammer-info-box" style="display: none;">
+                            <div class="info-box-row">
+                                <span class="info-box-label">Status</span>
+                                <span class="info-box-value" id="spammer-info">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Console Section -->
+                <section class="section" id="console">
+                    <div class="card">
+                        <div class="console-container">
+                            <div class="console-header">
+                                <div class="console-title">
+                                    <i data-lucide="terminal"></i>
+                                    Console Output
+                                </div>
+                            </div>
+                            <div class="console-body" id="console-body">
+                                <div class="console-line">
+                                    <span class="console-timestamp">[00:00:00]</span>
+                                    <span class="console-message">Console initialized. Ready to log events...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section class="section" id="settings">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i data-lucide="settings"></i>
+                                    Settings
+                                </div>
+                                <div class="card-subtitle">Configure your preferences</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Authorization Token</label>
+                            <input type="password" class="form-input" id="auth-token" placeholder="Enter your Discord token">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveActiveToken()">
+                            <i data-lucide="save"></i>
+                            Save Token
+                        </button>
+                        <label class="form-checkbox mt-4">
+                            <input type="checkbox" id="rate-limit" onchange="toggleRateLimit()">
+                            <span>Enable anti-rate limiting</span>
+                        </label>
+                        <div class="form-group mt-4">
+                            <label class="form-label">Theme</label>
+                            <select class="form-input" id="theme-select" onchange="setTheme(this.value)">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                                <option value="system">System</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Account Modal -->
+    <div class="modal-overlay" id="add-account-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Account</h3>
+                <button class="modal-close" onclick="closeAddAccountModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Account Name</label>
+                    <input type="text" class="form-input" id="modal-account-name" placeholder="Main Account">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Authorization Token</label>
+                    <input type="password" class="form-input" id="modal-auth-token" placeholder="Enter your Discord token">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddAccountModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveNewAccount()">
+                    <i data-lucide="check"></i>
+                    Add Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // State
+        let accounts = JSON.parse(localStorage.getItem('discord_accounts') || '{}');
+        let active_token = localStorage.getItem('active_discord_token') || '';
+        let rate_limit_enabled = localStorage.getItem('rate_limit_enabled') === 'true';
+        let sent_message_ids = [];
+        let total_messages_sent_server = 0;
+        let total_successes = 0;
+        let total_failures = 0;
+        let ping = 0;
+        let selectedTheme = 'dark';
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Object.keys(accounts).length === 0) {
+                showOOBE();
+            } else {
+                showApp();
+                loadAccounts();
+                updateHomeStats();
+            }
+            startWebsiteOnlineCount();
+            setupEventListeners();
+        });
+
+        function showOOBE() {
+            document.getElementById('oobe').style.display = 'flex';
+            document.getElementById('app-container').classList.remove('visible');
+            lucide.createIcons();
+        }
+
+        function showApp() {
+            document.getElementById('oobe').style.display = 'none';
+            document.getElementById('app-container').classList.add('visible');
+            lucide.createIcons();
+        }
+
+        function toggleTokenGuide() {
+            const guide = document.querySelector('.token-guide');
+            guide.classList.toggle('open');
+            lucide.createIcons();
+        }
+
+        function setupEventListeners() {
+            // Mobile menu
+            document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+                document.getElementById('mobile-overlay').classList.toggle('active');
+            });
+
+            document.getElementById('mobile-overlay')?.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('mobile-overlay').classList.remove('active');
+            });
+
+            // Account dropdown
+            document.getElementById('account-selector')?.addEventListener('click', (e) => {
+                if (!e.target.closest('.account-action')) {
+                    document.getElementById('account-selector').classList.toggle('open');
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const selector = document.getElementById('account-selector');
+                if (selector && !selector.contains(e.target)) {
+                    selector.classList.remove('open');
+                }
+            });
+
+            // Theme toggle
+            document.getElementById('theme-toggle')?.addEventListener('click', () => {
+                const currentTheme = localStorage.getItem('dneraider_theme') || 'dark';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+            });
+        }
+
+        // OOBE Functions
+        function selectTheme(theme) {
+            selectedTheme = theme;
+            document.querySelectorAll('.oobe-theme-option').forEach(opt => {
+                opt.classList.remove('selected');
+                opt.querySelector('input').checked = false;
+            });
+            const selected = document.querySelector(`[data-theme="${theme}"]`);
+            selected.classList.add('selected');
+            selected.querySelector('input').checked = true;
+            setTheme(theme);
+        }
+
+        function oobeNext(step) {
+            if (step === 1) {
+                document.getElementById('oobe-step-1').classList.remove('active');
+                document.getElementById('oobe-step-2').classList.add('active');
+                document.getElementById('progress-0').classList.add('completed');
+                document.getElementById('progress-0').classList.remove('active');
+                document.getElementById('progress-1').classList.add('active');
+                lucide.createIcons();
+            }
+        }
+
+        function oobeBack(step) {
+            if (step === 2) {
+                document.getElementById('oobe-step-2').classList.remove('active');
+                document.getElementById('oobe-step-1').classList.add('active');
+                document.getElementById('progress-1').classList.remove('active');
+                document.getElementById('progress-0').classList.remove('completed');
+                document.getElementById('progress-0').classList.add('active');
+                lucide.createIcons();
+            }
+        }
+
+        function oobeFinish() {
+            const name = document.getElementById('oobe-account-name').value.trim();
+            const token = document.getElementById('oobe-auth-token').value.trim();
+            
+            if (!name || !token) {
+                showToast('Please enter both account name and token', 'error');
+                return;
+            }
+
+            accounts[name] = token;
+            localStorage.setItem('discord_accounts', JSON.stringify(accounts));
+            active_token = token;
+            localStorage.setItem('active_discord_token', active_token);
+            
+            showApp();
+            loadAccounts();
+            updateHomeStats();
+            logToConsole(`Account "${name}" added successfully`, 'success');
+        }
+
+        // Theme Functions
+        function setTheme(theme) {
+            localStorage.setItem('dneraider_theme', theme);
+            
+            if (theme === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.body.classList.toggle('light', !prefersDark);
+                document.body.classList.toggle('dark', prefersDark);
+            } else {
+                document.body.classList.toggle('light', theme === 'light');
+                document.body.classList.toggle('dark', theme === 'dark');
+            }
+
+            const toggle = document.getElementById('theme-toggle');
+            if (toggle) {
+                toggle.classList.toggle('active', theme !== 'dark');
+            }
+
+            const select = document.getElementById('theme-select');
+            if (select) select.value = theme;
+        }
+
+        // Account Functions
+        // Store user data cache
+        let userDataCache = JSON.parse(localStorage.getItem('discord_user_cache') || '{}');
+
+        async function fetchUserData(token) {
+            try {
+                const res = await fetch('https://discord.com/api/v10/users/@me', {
+                    headers: { 'Authorization': token }
+                });
+                if (res.ok) {
+                    return await res.json();
+                }
+            } catch (e) {
+                console.error('Failed to fetch user data:', e);
+            }
+            return null;
+        }
+
+        function getAvatarUrl(userId, avatarHash) {
+            if (!avatarHash) return null;
+            const ext = avatarHash.startsWith('a_') ? 'gif' : 'png';
+            return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=128`;
+        }
+
+        async function loadAccounts() {
+            const dropdown = document.getElementById('account-dropdown');
+            const accountName = document.getElementById('account-name');
+            const accountAvatar = document.getElementById('account-avatar');
+            
+            dropdown.innerHTML = '';
+            
+            let foundActive = false;
+            for (const name in accounts) {
+                const token = accounts[name];
+                const isActive = token === active_token;
+                
+                // Try to get cached user data or fetch it
+                let userData = userDataCache[token];
+                if (!userData) {
+                    userData = await fetchUserData(token);
+                    if (userData) {
+                        userDataCache[token] = userData;
+                        localStorage.setItem('discord_user_cache', JSON.stringify(userDataCache));
+                    }
+                }
+                
+                const avatarUrl = userData ? getAvatarUrl(userData.id, userData.avatar) : null;
+                const displayName = userData?.global_name || userData?.username || name;
+                
+                const item = document.createElement('div');
+                item.className = 'account-dropdown-item' + (isActive ? ' active' : '');
+                item.innerHTML = `
+                    <div class="account-avatar" ${avatarUrl ? `style="background-image: url('${avatarUrl}')"` : ''}>${avatarUrl ? '' : name[0].toUpperCase()}</div>
+                    <div class="account-info">
+                        <div class="account-name">${displayName}</div>
+                        ${userData?.username ? `<div class="account-status">@${userData.username}</div>` : ''}
+                    </div>
+                    <div class="account-dropdown-actions">
+                        <button class="account-action" onclick="event.stopPropagation(); editAccount('${name.replace(/'/g, "\\'")}')">
+                            <i data-lucide="edit-2"></i>
+                        </button>
+                        <button class="account-action delete" onclick="event.stopPropagation(); removeAccount('${name.replace(/'/g, "\\'")}')">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    if (!isActive) {
+                        switchAccount(name, accounts[name]);
+                    }
+                });
+                
+                dropdown.appendChild(item);
+                
+                if (isActive) {
+                    accountName.textContent = displayName;
+                    if (avatarUrl) {
+                        accountAvatar.style.backgroundImage = `url('${avatarUrl}')`;
+                        accountAvatar.textContent = '';
+                    } else {
+                        accountAvatar.style.backgroundImage = '';
+                        accountAvatar.textContent = name[0].toUpperCase();
+                    }
+                    foundActive = true;
+                }
+            }
+            
+            if (!foundActive) {
+                accountName.textContent = 'Select Account';
+                accountAvatar.style.backgroundImage = '';
+                accountAvatar.textContent = '?';
+            }
+            
+            lucide.createIcons();
+        }
+
+        function switchAccount(name, token) {
+            active_token = token;
+            localStorage.setItem('active_discord_token', active_token);
+            loadAccounts();
+            updateHomeStats();
+            document.getElementById('account-selector').classList.remove('open');
+            document.getElementById('auth-token').value = active_token;
+            logToConsole(`Switched to account: ${name}`, 'success');
+        }
+
+        function editAccount(name) {
+            const newName = prompt('Edit account name:', name);
+            if (!newName || newName.trim() === '') return;
+            
+            const newToken = prompt('Edit account token:', accounts[name]);
+            if (!newToken || newToken.trim() === '') return;
+            
+            const wasActive = accounts[name] === active_token;
+            if (newName !== name) delete accounts[name];
+            
+            accounts[newName] = newToken;
+            localStorage.setItem('discord_accounts', JSON.stringify(accounts));
+            
+            if (wasActive) {
+                active_token = newToken;
+                localStorage.setItem('active_discord_token', active_token);
+            }
+            
+            loadAccounts();
+            logToConsole(`Account "${name}" updated`, 'success');
+        }
+
+        function removeAccount(name) {
+            if (!confirm(`Remove account "${name}"?`)) return;
+            
+            const wasActive = accounts[name] === active_token;
+            delete accounts[name];
+            localStorage.setItem('discord_accounts', JSON.stringify(accounts));
+            
+            if (wasActive) {
+                const names = Object.keys(accounts);
+                if (names.length > 0) {
+                    active_token = accounts[names[0]];
+                    localStorage.setItem('active_discord_token', active_token);
+                } else {
+                    active_token = '';
+                    localStorage.setItem('active_discord_token', '');
+                }
+            }
+            
+            loadAccounts();
+            logToConsole(`Account "${name}" removed`, 'fail');
+        }
+
+        function openAddAccountModal() {
+            document.getElementById('add-account-modal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function closeAddAccountModal() {
+            document.getElementById('add-account-modal').classList.remove('active');
+            document.getElementById('modal-account-name').value = '';
+            document.getElementById('modal-auth-token').value = '';
+        }
+
+        function saveNewAccount() {
+            const name = document.getElementById('modal-account-name').value.trim();
+            const token = document.getElementById('modal-auth-token').value.trim();
+            
+            if (!name || !token) {
+                showToast('Please enter both account name and token', 'error');
+                return;
+            }
+            
+            accounts[name] = token;
+            localStorage.setItem('discord_accounts', JSON.stringify(accounts));
+            active_token = token;
+            localStorage.setItem('active_discord_token', active_token);
+            
+            loadAccounts();
+            updateHomeStats();
+            closeAddAccountModal();
+            logToConsole(`Account "${name}" added`, 'success');
+        }
+
+        function saveActiveToken() {
+            const currentToken = document.getElementById('auth-token').value;
+            const activeAccountName = Object.keys(accounts).find(key => accounts[key] === active_token) || '';
+            
+            if (activeAccountName) {
+                accounts[activeAccountName] = currentToken;
+                localStorage.setItem('discord_accounts', JSON.stringify(accounts));
+                active_token = currentToken;
+                localStorage.setItem('active_discord_token', active_token);
+                loadAccounts();
+                showToast('Token updated successfully', 'success');
+            } else {
+                showToast('No active account selected', 'error');
+            }
+        }
+
+        // Navigation
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.getElementById(`nav-${id === 'threads-posts' ? 'threads' : id === 'channel-manager' ? 'channel' : id}`).classList.add('active');
+            
+            const titles = {
+                'home': 'Dashboard',
+                'server': 'Server Actions',
+                'webhook': 'Webhook Sender',
+                'channel-manager': 'Channel Manager',
+                'threads-posts': 'Thread Spammer',
+                'console': 'Console',
+                'settings': 'Settings'
+            };
+            document.getElementById('page-title').textContent = titles[id] || 'Dashboard';
+            
+            // Close mobile menu if open
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('mobile-overlay').classList.remove('active');
+            
+            // Load data for specific sections
+            if (id === 'threads-posts') {
+                loadSpammerServers();
+            }
+        }
+
+        // Stats
+        function getAuthHeader(token) {
+            // User tokens (selfbots) should be sent as raw token without any prefix
+            // Remove any accidental prefixes if they exist
+            if (token.startsWith('Bot ')) {
+                return token.substring(4);
+            }
+            if (token.startsWith('Bearer ')) {
+                return token.substring(7);
+            }
+            return token; // Return raw user token
+        }
+
+        function getOrCreateClientId() {
+            const storageKey = 'dnezClientId';
+            let clientId = localStorage.getItem(storageKey);
+
+            if (!clientId) {
+                if (window.crypto && crypto.randomUUID) {
+                    clientId = crypto.randomUUID().replace(/-/g, '');
+                } else {
+                    clientId = `${Date.now()}${Math.random().toString(36).slice(2)}`;
+                }
+                localStorage.setItem(storageKey, clientId);
+            }
+
+            return clientId;
+        }
+
+        async function refreshWebsiteOnlineCount() {
+            const onlineCountEl = document.getElementById('websiteOnlineCount');
+            if (!onlineCountEl) return;
+
+            try {
+                const clientId = getOrCreateClientId();
+                const response = await fetch(`/api/online?cid=${encodeURIComponent(clientId)}`, {
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) return;
+
+                const data = await response.json();
+                if (typeof data.online === 'number') {
+                    onlineCountEl.textContent = data.online.toLocaleString();
+                }
+            } catch (error) {
+                console.error('Failed to fetch website online count', error);
+            }
+        }
+
+        function startWebsiteOnlineCount() {
+            refreshWebsiteOnlineCount();
+            setInterval(refreshWebsiteOnlineCount, 1000);
+        }
+
+        async function updateHomeStats() {
+            if (!active_token) return;
+            
+            const authHeader = getAuthHeader(active_token);
+            
+            try {
+                const friendsRes = await fetch('https://discord.com/api/v10/users/@me/relationships', {
+                    headers: { 
+                        'Authorization': authHeader,
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                    }
+                });
+                
+                if (friendsRes.status === 403) {
+                    logToConsole('403 Forbidden: Check your token validity', 'fail');
+                    showToast('Token access denied (403) - Verify your token', 'error');
+                    document.getElementById('total-friends').textContent = '0';
+                    return;
+                }
+                
+                const friends = await friendsRes.json();
+                document.getElementById('total-friends').textContent = Array.isArray(friends) ? friends.length : 0;
+            } catch (err) {
+                logToConsole(`Error fetching friends: ${err.message}`, 'fail');
+                document.getElementById('total-friends').textContent = '0';
+            }
+            
+            try {
+                const dmsRes = await fetch('https://discord.com/api/v10/users/@me/channels', {
+                    headers: { 
+                        'Authorization': authHeader,
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                    }
+                });
+                
+                if (dmsRes.status === 403) {
+                    logToConsole('403 Forbidden: Check your token validity', 'fail');
+                    document.getElementById('total-dms').textContent = '0';
+                    return;
+                }
+                
+                const dms = await dmsRes.json();
+                document.getElementById('total-dms').textContent = Array.isArray(dms) ? dms.length : 0;
+            } catch (err) {
+                logToConsole(`Error fetching DMs: ${err.message}`, 'fail');
+                document.getElementById('total-dms').textContent = '0';
+            }
+            
+            try {
+                const guildsRes = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+                    headers: { 
+                        'Authorization': authHeader,
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                    }
+                });
+                
+                if (guildsRes.status === 403) {
+                    logToConsole('403 Forbidden: Check your token validity', 'fail');
+                    document.getElementById('total-servers').textContent = '0';
+                    return;
+                }
+                
+                const guilds = await guildsRes.json();
+                document.getElementById('total-servers').textContent = Array.isArray(guilds) ? guilds.length : 0;
+            } catch (err) {
+                logToConsole(`Error fetching servers: ${err.message}`, 'fail');
+                document.getElementById('total-servers').textContent = '0';
+            }
+        }
+
+        function updateMessageCounts() {
+            document.getElementById('server-messages-sent').textContent = total_messages_sent_server;
+            document.getElementById('total-successes').textContent = total_successes;
+            document.getElementById('total-failures').textContent = total_failures;
+            document.getElementById('ping').textContent = ping + 'ms';
+            document.getElementById('total-messages-sent').textContent = total_messages_sent_server;
+            document.getElementById('total-successes-home').textContent = total_successes;
+            document.getElementById('total-failures-home').textContent = total_failures;
+        }
+
+        // Server Actions
+        async function startSendingServer() {
+            const serverId = document.getElementById('server-id').value.trim();
+            const channelId = document.getElementById('channel-id').value.trim();
+            const message = document.getElementById('server-message').value;
+            const numMessages = parseInt(document.getElementById('server-num-messages').value, 10) || 1;
+            const delay = parseFloat(document.getElementById('message-delay').value) * 1000 || 1000;
+
+            if (!serverId && !channelId) {
+                showToast('Please enter a Server ID or Channel ID', 'error');
+                return;
+            }
+            if (!message) {
+                showToast('Please enter a message', 'error');
+                return;
+            }
+
+            if (channelId) {
+                await sendMessagesToChannel(channelId, message, numMessages, delay);
+            } else if (serverId) {
+                await sendMessagesToRandomChannel(serverId, message, numMessages, delay);
+            }
+        }
+
+        async function sendMessagesToChannel(channel_id, message, num_messages, delay) {
+            for (let i = 0; i < num_messages; i++) {
+                await sendMessage(channel_id, message);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            total_messages_sent_server += num_messages;
+            updateMessageCounts();
+        }
+
+        async function sendMessagesToRandomChannel(server_id, message, num_messages, delay) {
+            if (!active_token) {
+                logToConsole('No active authorization token', 'fail');
+                showToast('No active token selected', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`https://discord.com/api/v10/guilds/${server_id}/channels`, {
+                    headers: {
+                        'Authorization': active_token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const channels = await response.json();
+                
+                if (!Array.isArray(channels)) {
+                    logToConsole('Failed to fetch channels', 'fail');
+                    showToast('Failed to fetch channels', 'error');
+                    return;
+                }
+                
+                const text_channels = channels.filter(channel => channel.type === 0);
+                if (text_channels.length === 0) {
+                    logToConsole('No valid text channels found', 'fail');
+                    showToast('No valid text channels found', 'error');
+                    return;
+                }
+                
+                for (let i = 0; i < num_messages; i++) {
+                    const random_channel = text_channels[Math.floor(Math.random() * text_channels.length)];
+                    if (random_channel && random_channel.id) {
+                        await sendMessage(random_channel.id, message);
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                total_messages_sent_server += num_messages;
+                updateMessageCounts();
+            } catch (error) {
+                logToConsole(`Error fetching server channels: ${error}`, 'fail');
+                showToast('Error fetching server channels', 'error');
+            }
+        }
+
+        async function sendMessage(channel_id, message) {
+            if (!active_token) {
+                logToConsole('No active authorization token', 'fail');
+                showToast('No active token selected', 'error');
+                return;
+            }
+            
+            const url = `https://discord.com/api/v10/channels/${channel_id}/messages`;
+            const startTime = performance.now();
+            const authHeader = getAuthHeader(active_token);
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': authHeader,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: message, tts: false })
+                });
+                
+                const endTime = performance.now();
+                ping = Math.round(endTime - startTime);
+                
+                if (response.status === 429) {
+                    const retryData = await response.json();
+                    const retry_after = retryData.retry_after || 1;
+                    logToConsole(`Rate limited. Retrying in ${retry_after}s...`, 'fail');
+                    await new Promise(resolve => setTimeout(resolve, retry_after * 1000));
+                    return sendMessage(channel_id, message);
+                }
+                
+                if (response.status === 401) {
+                    logToConsole('401 Unauthorized: Invalid or expired token', 'fail');
+                    showToast('Your token is invalid or expired. Please update it.', 'error');
+                    return null;
+                }
+                
+                if (response.status === 403) {
+                    let errMsg = 'Missing Access or permissions';
+                    try {
+                        const errData = await response.json();
+                        errMsg = errData.message || errMsg;
+                    } catch {}
+                    logToConsole(`403 Forbidden: ${errMsg}`, 'fail');
+                    showToast(`403 Error: ${errMsg}`, 'error');
+                    total_failures++;
+                    updateMessageCounts();
+                    return null;
+                }
+                
+                if (response.status === 404) {
+                    logToConsole(`404 Not Found: Channel ${channel_id} does not exist`, 'fail');
+                    total_failures++;
+                    updateMessageCounts();
+                    return null;
+                }
+                
+                const responseData = await response.json();
+                
+                if (response.ok) {
+                    logToConsole(`Message sent to channel ${channel_id}`, 'success');
+                    total_successes++;
+                    sent_message_ids.push(responseData.id);
+                    updateMessageCounts();
+                    return responseData;
+                } else {
+                    logToConsole(`Failed to send message: ${response.status} - ${responseData.message || 'Unknown error'}`, 'fail');
+                    total_failures++;
+                    updateMessageCounts();
+                    return null;
+                }
+            } catch (error) {
+                // CORS error or network error
+                if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                    logToConsole('CORS Error: Browser blocking Discord API request. Try using a browser extension to disable CORS or host this on a server with a proxy.', 'fail');
+                    showToast('CORS blocked - See console for details', 'error');
+                } else {
+                    logToConsole(`Error sending message: ${error.message}`, 'fail');
+                }
+                total_failures++;
+                updateMessageCounts();
+                return null;
+            }
+        }
+
+        async function purgeMessages() {
+            if (!active_token) {
+                logToConsole('No active authorization token', 'fail');
+                return;
+            }
+            
+            const channel_id = document.getElementById('channel-id').value.trim();
+            if (!channel_id) {
+                logToConsole('Please specify a channel ID to purge messages', 'fail');
+                showToast('Please specify a channel ID', 'error');
+                return;
+            }
+            
+            const authHeader = getAuthHeader(active_token);
+            let deleted = 0;
+            let failed = 0;
+            
+            for (const message_id of sent_message_ids) {
+                const url = `https://discord.com/api/v10/channels/${channel_id}/messages/${message_id}`;
+                try {
+                    const response = await fetch(url, {
+                        method: 'DELETE',
+                        headers: { 
+                            'Authorization': authHeader,
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        logToConsole(`Message ${message_id} deleted`, 'success');
+                        deleted++;
+                    } else if (response.status === 403) {
+                        logToConsole(`403 Forbidden: Cannot delete message ${message_id}`, 'fail');
+                        failed++;
+                    } else if (response.status === 404) {
+                        logToConsole(`Message ${message_id} not found`, 'fail');
+                        failed++;
+                    } else {
+                        logToConsole(`Failed to delete message ${message_id} - ${response.status}`, 'fail');
+                        failed++;
+                    }
+                } catch (error) {
+                    logToConsole(`Error deleting message ${message_id}: ${error.message}`, 'fail');
+                    failed++;
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            sent_message_ids = [];
+            total_messages_sent_server = 0;
+            total_successes = 0;
+            total_failures = 0;
+            updateMessageCounts();
+            logToConsole(`Purge completed: ${deleted} deleted, ${failed} failed`, 'success');
+        }
+
+        // Webhook Functions
+        async function validateWebhook(url) {
+            const previewImg = document.getElementById('webhook-profile-preview');
+            const previewName = document.getElementById('webhook-name-preview');
+            
+            if (!url.startsWith('https://discord.com/api/webhooks/')) {
+                showToast('Invalid Discord webhook URL', 'error');
+                return false;
+            }
+            
+            try {
+                const res = await fetch(url);
+                if (!res.ok) {
+                    showToast('Webhook not found or invalid permissions', 'error');
+                    return false;
+                }
+                
+                const data = await res.json();
+                if (data.name) previewName.textContent = data.name;
+                if (data.avatar) {
+                    previewImg.src = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
+                } else {
+                    previewImg.src = '';
+                }
+                
+                document.getElementById('webhook-preview').style.display = 'flex';
+                return true;
+            } catch (e) {
+                showToast('Failed to validate webhook', 'error');
+                return false;
+            }
+        }
+
+        async function startSendingWebhook() {
+            const url = document.getElementById('webhook-url').value.trim();
+            const name = document.getElementById('webhook-name').value.trim();
+            const message = document.getElementById('webhook-message').value;
+            const numMessages = parseInt(document.getElementById('webhook-num-messages').value, 10) || 1;
+            const delay = parseFloat(document.getElementById('webhook-message-delay').value) * 1000 || 1000;
+
+            if (!url || !message) {
+                showToast('Please enter both a webhook URL and a message', 'error');
+                return;
+            }
+            
+            const valid = await validateWebhook(url);
+            if (!valid) return;
+
+            for (let i = 0; i < numMessages; i++) {
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content: message,
+                            username: name || undefined
+                        })
+                    });
+                    
+                    if (res.ok) {
+                        logToConsole(`Webhook message sent: ${message}`, 'success');
+                    } else {
+                        logToConsole(`Failed to send webhook message: ${res.status}`, 'fail');
+                    }
+                } catch (e) {
+                    logToConsole(`Error sending webhook: ${e}`, 'fail');
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+
+        // Channel Manager
+        async function processChannelActions() {
+            const serverId = document.getElementById('server-id-channel-manager').value.trim();
+            const actionsText = document.getElementById('channel-actions').value.trim();
+            
+            if (!serverId || !actionsText) {
+                showToast('Please enter a Server ID and at least one action', 'error');
+                return;
+            }
+            
+            const actions = actionsText.split('\n').map(line => line.trim()).filter(Boolean);
+            
+            let channels = [];
+            try {
+                const res = await fetch(`https://discord.com/api/v10/guilds/${serverId}/channels`, {
+                    headers: { 'Authorization': active_token }
+                });
+                channels = await res.json();
+                if (!Array.isArray(channels)) throw new Error('Failed to fetch channels');
+            } catch (e) {
+                showToast('Failed to fetch channels for this server', 'error');
+                logToConsole('Failed to fetch channels: ' + e, 'fail');
+                return;
+            }
+
+            for (const action of actions) {
+                if (action.startsWith('create:')) {
+                    const name = action.slice(7).trim();
+                    if (!name) continue;
+                    try {
+                        const res = await fetch(`https://discord.com/api/v10/guilds/${serverId}/channels`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': active_token,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ name, type: 0 })
+                        });
+                        if (res.ok) {
+                            logToConsole(`Created channel "${name}"`, 'success');
+                        } else {
+                            logToConsole(`Failed to create channel "${name}"`, 'fail');
+                        }
+                    } catch (e) {
+                        logToConsole(`Error creating channel "${name}": ${e}`, 'fail');
+                    }
+                } else if (action.startsWith('delete:')) {
+                    const channelId = action.slice(7).trim();
+                    if (!channelId) continue;
+                    try {
+                        const res = await fetch(`https://discord.com/api/v10/channels/${channelId}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': active_token }
+                        });
+                        if (res.ok) {
+                            logToConsole(`Deleted channel ${channelId}`, 'success');
+                        } else {
+                            logToConsole(`Failed to delete channel ${channelId}`, 'fail');
+                        }
+                    } catch (e) {
+                        logToConsole(`Error deleting channel ${channelId}: ${e}`, 'fail');
+                    }
+                } else if (action.startsWith('rename:')) {
+                    const parts = action.split(':');
+                    if (parts.length < 3) continue;
+                    const channelId = parts[1].trim();
+                    const newName = parts.slice(2).join(':').trim();
+                    try {
+                        const res = await fetch(`https://discord.com/api/v10/channels/${channelId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': active_token,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ name: newName })
+                        });
+                        if (res.ok) {
+                            logToConsole(`Renamed channel ${channelId} to "${newName}"`, 'success');
+                        } else {
+                            logToConsole(`Failed to rename channel ${channelId}`, 'fail');
+                        }
+                    } catch (e) {
+                        logToConsole(`Error renaming channel ${channelId}: ${e}`, 'fail');
+                    }
+                }
+            }
+            
+            showToast('Channel actions completed', 'success');
+        }
+
+        // Thread Spammer
+        async function loadSpammerServers() {
+            const select = document.getElementById('spammer-server-select');
+            select.innerHTML = '<option value="">Loading...</option>';
+            
+            if (!active_token) {
+                select.innerHTML = '<option value="">No token</option>';
+                return;
+            }
+            
+            try {
+                const res = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+                    headers: { 'Authorization': active_token }
+                });
+                const guilds = await res.json();
+                
+                if (!Array.isArray(guilds)) throw new Error('Failed to fetch servers');
+                
+                select.innerHTML = '<option value="">Select a server</option>';
+                for (const g of guilds) {
+                    const opt = document.createElement('option');
+                    opt.value = g.id;
+                    opt.textContent = g.name;
+                    select.appendChild(opt);
+                }
+            } catch {
+                select.innerHTML = '<option value="">Failed to load</option>';
+            }
+        }
+
+        async function loadSpammerChannels() {
+            const serverId = document.getElementById('spammer-server-select').value;
+            const select = document.getElementById('spammer-channel-select');
+            select.innerHTML = '';
+            
+            if (!serverId || !active_token) {
+                select.innerHTML = '<option value="">Select a server first</option>';
+                return;
+            }
+            
+            try {
+                const res = await fetch(`https://discord.com/api/v10/guilds/${serverId}/channels`, {
+                    headers: { 'Authorization': active_token }
+                });
+                const channels = await res.json();
+                
+                if (!Array.isArray(channels)) throw new Error('Failed to fetch channels');
+                
+                for (const ch of channels) {
+                    if (ch.type === 0 || ch.type === 15) {
+                        const opt = document.createElement('option');
+                        opt.value = ch.id;
+                        opt.textContent = `[${ch.type === 0 ? 'Text' : 'Forum'}] ${ch.name}`;
+                        select.appendChild(opt);
+                    }
+                }
+            } catch {
+                select.innerHTML = '<option value="">Failed to load channels</option>';
+            }
+        }
+
+        function toggleAllChannelsSpammer() {
+            const all = document.getElementById('spammer-all-channels').checked;
+            document.getElementById('spammer-channel-select').disabled = all;
+        }
+
+        async function startThreadsSpammer() {
+            const serverId = document.getElementById('spammer-server-select').value;
+            const allChannels = document.getElementById('spammer-all-channels').checked;
+            const channelSelect = document.getElementById('spammer-channel-select');
+            const threadName = document.getElementById('spammer-thread-name').value.trim();
+            const message = document.getElementById('spammer-thread-message').value.trim();
+            const num = parseInt(document.getElementById('spammer-num').value, 10) || 1;
+            const delay = parseFloat(document.getElementById('spammer-delay').value) * 1000 || 1000;
+            
+            if (!serverId || !threadName || !message) {
+                showToast('Please select a server, enter a thread name and message', 'error');
+                return;
+            }
+            
+            let channelIds = [];
+            if (allChannels) {
+                try {
+                    const res = await fetch(`https://discord.com/api/v10/guilds/${serverId}/channels`, {
+                        headers: { 'Authorization': active_token }
+                    });
+                    const channels = await res.json();
+                    channelIds = channels.filter(ch => ch.type === 0).map(ch => ch.id);
+                } catch {
+                    showToast('Failed to fetch channels', 'error');
+                    return;
+                }
+            } else {
+                channelIds = Array.from(channelSelect.selectedOptions).map(opt => opt.value);
+            }
+            
+            if (!channelIds.length) {
+                showToast('No channels selected', 'error');
+                return;
+            }
+            
+            document.getElementById('spammer-info-box').style.display = 'block';
+            let total = 0, success = 0, fail = 0;
+            
+            for (const chId of channelIds) {
+                for (let i = 0; i < num; i++) {
+                    try {
+                        const res = await fetch(`https://discord.com/api/v10/channels/${chId}/threads`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': active_token,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: threadName,
+                                message: { content: message }
+                            })
+                        });
+                        
+                        total++;
+                        if (res.ok) {
+                            success++;
+                            logToConsole(`Created thread "${threadName}" in channel ${chId}`, 'success');
+                        } else {
+                            fail++;
+                            logToConsole(`Failed to create thread in channel ${chId}`, 'fail');
+                        }
+                    } catch (e) {
+                        total++;
+                        fail++;
+                        logToConsole(`Error creating thread: ${e}`, 'fail');
+                    }
+                    
+                    document.getElementById('spammer-info').textContent = `Threads: ${total}, Success: ${success}, Fail: ${fail}`;
+                    await new Promise(r => setTimeout(r, delay));
+                }
+            }
+            
+            showToast('Threads spam completed', 'success');
+        }
+
+        async function startPostsSpammer() {
+            const serverId = document.getElementById('spammer-server-select').value;
+            const allChannels = document.getElementById('spammer-all-channels').checked;
+            const channelSelect = document.getElementById('spammer-channel-select');
+            const postName = document.getElementById('spammer-thread-name').value.trim();
+            const message = document.getElementById('spammer-thread-message').value.trim();
+            const num = parseInt(document.getElementById('spammer-num').value, 10) || 1;
+            const delay = parseFloat(document.getElementById('spammer-delay').value) * 1000 || 1000;
+            
+            if (!serverId || !postName || !message) {
+                showToast('Please select a server, enter a post name and message', 'error');
+                return;
+            }
+            
+            let channelIds = [];
+            if (allChannels) {
+                try {
+                    const res = await fetch(`https://discord.com/api/v10/guilds/${serverId}/channels`, {
+                        headers: { 'Authorization': active_token }
+                    });
+                    const channels = await res.json();
+                    channelIds = channels.filter(ch => ch.type === 15).map(ch => ch.id);
+                } catch {
+                    showToast('Failed to fetch channels', 'error');
+                    return;
+                }
+            } else {
+                channelIds = Array.from(channelSelect.selectedOptions).map(opt => opt.value);
+            }
+            
+            if (!channelIds.length) {
+                showToast('No forum channels selected', 'error');
+                return;
+            }
+            
+            document.getElementById('spammer-info-box').style.display = 'block';
+            let total = 0, success = 0, fail = 0;
+            
+            for (const chId of channelIds) {
+                for (let i = 0; i < num; i++) {
+                    try {
+                        const res = await fetch(`https://discord.com/api/v10/channels/${chId}/threads`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': active_token,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: postName,
+                                message: { content: message }
+                            })
+                        });
+                        
+                        total++;
+                        if (res.ok) {
+                            success++;
+                            logToConsole(`Created post "${postName}" in forum ${chId}`, 'success');
+                        } else {
+                            fail++;
+                            logToConsole(`Failed to create post in forum ${chId}`, 'fail');
+                        }
+                    } catch (e) {
+                        total++;
+                        fail++;
+                        logToConsole(`Error creating post: ${e}`, 'fail');
+                    }
+                    
+                    document.getElementById('spammer-info').textContent = `Posts: ${total}, Success: ${success}, Fail: ${fail}`;
+                    await new Promise(r => setTimeout(r, delay));
+                }
+            }
+            
+            showToast('Posts spam completed', 'success');
+        }
+
+        // Utility Functions
+        function logToConsole(message, type = '') {
+            const consoleBody = document.getElementById('console-body');
+            if (!consoleBody) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.innerHTML = `
+                <span class="console-timestamp">[${timestamp}]</span>
+                <span class="console-message ${type}">${message}</span>
+            `;
+            
+            consoleBody.appendChild(line);
+            consoleBody.scrollTop = consoleBody.scrollHeight;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const iconMap = {
+                'success': 'check-circle',
+                'error': 'x-circle',
+                'warning': 'alert-triangle'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i data-lucide="${iconMap[type] || 'info'}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i data-lucide="x"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.classList.add('closing');
+                setTimeout(() => toast.remove(), 200);
+            }, 5000);
+        }
+
+        function toggleRateLimit() {
+            rate_limit_enabled = document.getElementById('rate-limit').checked;
+            localStorage.setItem('rate_limit_enabled', rate_limit_enabled);
+            logToConsole('Anti Rate Limiting ' + (rate_limit_enabled ? 'enabled' : 'disabled'), 'success');
+        }
+
+        // Apply saved theme on load
+        const savedTheme = localStorage.getItem('dneraider_theme') || 'dark';
+        setTheme(savedTheme);
+    </script>
+<script>
+</script>
+
+</body>
+</html>
+```
